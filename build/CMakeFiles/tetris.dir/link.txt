@@ -1,1 +1,0 @@
-/usr/bin/g++  -Wall -Werror -Wextra   CMakeFiles/tetris.dir/src/main.cpp.o CMakeFiles/tetris.dir/src/rng/random.cpp.o CMakeFiles/tetris.dir/src/tetris/shape/shape.cpp.o  -o tetris 
