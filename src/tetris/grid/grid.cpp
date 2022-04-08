@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   grid.cpp                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: Leo Suardi <lsuardi@student.42.fr>         +#+  +:+       +#+        */
+/*   By: lsuardi <lsuardi@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/04/07 12:28:28 by Leo Suardi        #+#    #+#             */
-/*   Updated: 2022/04/07 23:31:06 by Leo Suardi       ###   ########.fr       */
+/*   Updated: 2022/04/08 17:49:38 by lsuardi          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -100,6 +100,14 @@ namespace tetris {
   grid  &grid::rotate( void ) {
     if (!m_curShape)
       throw NoShapeException();
+  shape  tmp = m_curShape;
+
+  tmp.rotate();
+  for (auto i: range(0, 4)) {
+    for (auto j: range(0, 4)) {
+      
+    }
+  }
     m_curShape->rotate();
   }
 
@@ -107,14 +115,15 @@ namespace tetris {
     for (auto i: range(0, 18)) {
       for (auto j: range(0, 10)) {
         if (!m_flushed[i][j]) {
-          tgotoxy(m_pos.x + j, m_pos.y + i);
-          tsetbg(m_data[i][j]);
+          term_gotoxy(m_pos.x + j, m_pos.y + i);
+          term_setbg(m_data[i][j]);
           write(1, "  ", 2);
+      m_flushed[i][j] = true;
         }
       }
     }
-    treset();
-    tgotoxy(0, 0);
+    term_reset();
+    term_gotoxy(0, 0);
     return *this;
   }
 
@@ -134,15 +143,17 @@ namespace tetris {
       for (auto i: range(0, 4)) {
         for (auto j: range(0, 4)) {
           if (data[i][j]) {
-            if (!j || !data[i][j - 1]) {
+            if (j == 3 || !data[i][j + 1]) {
               m_data[m_curShapePos.y + i][m_curShapePos.x + j] = 0;
               m_flushed[m_curShapePos.y + i][m_curShapePos.x + j] = false;
             }
           } else if (j < 3 && data[i][j + 1]) {
-            m_data[m_curShapePos.y + i][]
+            m_data[m_curShapePos.y + i][m_curShapePos.x + j] = data[i][j + 1];
+            m_flushed[m_curShapePos.y + i][m_curShapePos.x + j] = false;
           }
         }
       }
+      --m_curShapePos.x;
     } else {
       for (auto i: range(0, 4)) {
         for (auto j: range(0, 4)) {
@@ -151,6 +162,20 @@ namespace tetris {
             throw LatteralCollisionEvent();
         }
       }
+      for (auto i: range(0, 4)) {
+        for (auto j: range(0, 4)) {
+          if (data[i][j]) {
+            if (!j || !data[i][j - 1]) {
+              m_data[m_curShapePos.y + i][m_curShapePos.x + j] = 0;
+              m_flushed[m_curShapePos.y + i][m_curShapePos.x + j] = false;
+            }
+          } else if (j && data[i][j - 1]) {
+            m_data[m_curShapePos.y + i][m_curShapePos.x + j] = data[i][j - 1];
+            m_flushed[m_curShapePos.y + i][m_curShapePos.x + j] = false;
+          }
+        }
+      }
+      ++m_curShapePos.x;
     }
     return *this;
   }
